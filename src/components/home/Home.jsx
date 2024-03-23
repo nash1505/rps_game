@@ -30,8 +30,10 @@ const Home = () => {
           process.env.REACT_APP_STORE_NAME,
           playerDetails.userName
         );
-        if (status && status.length > 0) {
+        if (status && status.length > 0 && value == 1) {
           reject("duplicate Username");
+        }else if(status === undefined && value === 0){
+          throw new Error("Username Not found");
         }
       })
       .then(async (database) => {
