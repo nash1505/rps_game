@@ -31,7 +31,7 @@ const Home = () => {
           playerDetails.userName
         );
         if (status && status.length > 0) {
-          throw new Error("duplicate Username");
+          reject("duplicate Username");
         }
       })
       .then(async (database) => {
