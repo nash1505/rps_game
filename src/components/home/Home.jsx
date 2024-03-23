@@ -12,51 +12,53 @@ const Home = () => {
   let navigate = useNavigate();
   const [playerName, setPlayerName] = useState("");
   const playNow = (e) => {
-    e.stopPropagation();
-    const playerDetails = {
-      userName: playerName,
-      score: 0,
-    };
-    let db;
-    openDB(
-      process.env.REACT_APP_DB_NAME,
-      process.env.REACT_APP_DB_VERSION,
-      process.env.REACT_APP_STORE_NAME
-    )
-      .then(async (database) => {
-        db = database;
-        const status = await readData(
-          db,
-          process.env.REACT_APP_STORE_NAME,
-          playerDetails.userName
-        );
-        if (status && status.length > 0 && value == 1) {
-          reject("duplicate Username");
-        }else if(status === undefined && value === 0){
-          throw new Error("Username Not found");
-        }
-      })
-      .then(async (database) => {
-        if (value > 0) {
-          const status = await addData(
+    if (playerName.trim("").length > 0) {
+      e.stopPropagation();
+      const playerDetails = {
+        userName: playerName,
+        score: 0,
+      };
+      let db;
+      openDB(
+        process.env.REACT_APP_DB_NAME,
+        process.env.REACT_APP_DB_VERSION,
+        process.env.REACT_APP_STORE_NAME
+      )
+        .then(async (database) => {
+          db = database;
+          const status = await readData(
             db,
             process.env.REACT_APP_STORE_NAME,
-            playerDetails
+            playerDetails.userName
           );
-        }
-        sessionStorage.setItem("activeUser",playerName)
-        navigate("/lobby");
-      })
-      .catch((err) => {
-        console.log(err, "err");
-        alert(err);
-      });
+          if (status && status.length > 0 && value == 1) {
+            reject("duplicate Username");
+          } else if (status === undefined && value === 0) {
+            throw new Error("Username Not found");
+          }
+        })
+        .then(async (database) => {
+          if (value > 0) {
+            const status = await addData(
+              db,
+              process.env.REACT_APP_STORE_NAME,
+              playerDetails
+            );
+          }
+          sessionStorage.setItem("activeUser", playerName);
+          navigate("/lobby");
+        })
+        .catch((err) => {
+          console.log(err, "err");
+          alert(err);
+        });
+    }else{
+      alert("UserName cannot be empty")
+    }
   };
-
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
   return (
     <>
       <Grid container spacing={1} justifyContent={"center"}>

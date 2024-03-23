@@ -1,3 +1,9 @@
 {
-    "title": "Leaderboard"
+  "title": "Leaderboard",
+  "tableColums": {
+    "player": "Player Name",
+    "score": "Score"
+  },
+  "notavailable": "N/A",
+  "noPlayers": "There are no players available"
 }

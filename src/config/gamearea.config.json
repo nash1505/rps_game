@@ -1,3 +1,5 @@
 {
-  "moves": ["Rock", "Paper", "Scissor"]
+  "moves": ["Rock", "Paper", "Scissor"],
+  "playAgain": "play Again",
+  "exitGame": "Exit Game"
 }

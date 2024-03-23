@@ -4,7 +4,7 @@ export const openDB = (dbName, dbVersion, storeName) => {
     const request = indexedDB.open(dbName, dbVersion);
 
     request.onerror = () => {
-      reject('Error opening database');
+      reject("Error opening database");
     };
 
     request.onsuccess = () => {
@@ -14,7 +14,7 @@ export const openDB = (dbName, dbVersion, storeName) => {
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(storeName)) {
-        db.createObjectStore(storeName, { keyPath: 'userName' });
+        db.createObjectStore(storeName, { keyPath: "userName" });
       }
     };
   });
@@ -23,7 +23,7 @@ export const openDB = (dbName, dbVersion, storeName) => {
 // Add data
 export const addData = (db, storeName, data) => {
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([storeName], 'readwrite');
+    const transaction = db.transaction([storeName], "readwrite");
     const objectStore = transaction.objectStore(storeName);
     const request = objectStore.add(data);
 
@@ -32,7 +32,7 @@ export const addData = (db, storeName, data) => {
     };
 
     request.onerror = () => {
-      reject('Duplicate UserName');
+      reject("Duplicate UserName");
     };
   });
 };
@@ -49,32 +49,45 @@ export const readData = (db, storeName, id) => {
     };
 
     request.onerror = () => {
-      reject('Error reading data');
+      reject("Error reading data");
     };
   });
 };
 
 // Update data
 export const updateData = (db, storeName, data) => {
+  const transaction = db.transaction([storeName], "readwrite");
+  const objectStore = transaction.objectStore(storeName);
+  const request = objectStore.get(data.userName);
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([storeName], 'readwrite');
-    const objectStore = transaction.objectStore(storeName);
-    const request = objectStore.put(data);
+    request.onsuccess = (event) => {
+      const existingEntry = event.target.result;
+      if (!existingEntry) {
+        // Entry not found, create a new entry with score 0 and isPlaying set
+        const newEntry = { username, score: 0, isPlaying };
+        objectStore.put(newEntry).onsuccess = resolve;
+        objectStore.put(newEntry).onerror = reject;
+        return;
+      }
 
-    request.onsuccess = () => {
-      resolve(request.result);
+      // Entry found, update score (if provided) and add isPlaying field
+      const updatedEntry = {
+        ...existingEntry,
+        ...data,
+      };
+
+      objectStore.put(updatedEntry).onsuccess = resolve;
+      objectStore.put(updatedEntry).onerror = reject;
     };
 
-    request.onerror = () => {
-      reject('Error updating data');
-    };
+    request.onerror = reject;
   });
 };
 
 // Delete data
 export const deleteData = (db, storeName, id) => {
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([storeName], 'readwrite');
+    const transaction = db.transaction([storeName], "readwrite");
     const objectStore = transaction.objectStore(storeName);
     const request = objectStore.delete(id);
 
@@ -83,7 +96,7 @@ export const deleteData = (db, storeName, id) => {
     };
 
     request.onerror = () => {
-      reject('Error deleting data');
+      reject("Error deleting data");
     };
   });
 };

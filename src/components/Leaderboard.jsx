@@ -1,11 +1,13 @@
 import {
-  Avatar,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Typography,
+  Grid
 } from "@mui/material";
 import React, { useState } from "react";
 import leaderboardConfig from "../config/leaderboard.config.json";
@@ -22,33 +24,61 @@ const Leaderboard = () => {
     ).then(async (database) => {
       db = database;
       const list = await readData(db, process.env.REACT_APP_STORE_NAME);
-      setPlayersList(list);
+      if(list.length !== playersList.length){
+        setPlayersList(list);
+      }
     });
   };
-
+  let pollLeaderBoardData = setInterval(()=>{
+    getPlayersList()
+  },2000)
   React.useEffect(() => {
-    getPlayersList();
+    return()=>{
+      clearInterval(pollLeaderBoardData)
+    }
   }, []);
   return (
     <div>
-      <Typography variant="h3">{leaderboardConfig.title}</Typography>
+      <Typography variant="h3" color="grey" marginBottom="10px">
+        {leaderboardConfig.title}
+      </Typography>
       <Grid container>
-        <List
-          sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
-        >
-          {playersList.map((eachPlayer) => (
-            <ListItem key={eachPlayer?.userName} alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar
-                  alt={eachPlayer?.userName}
-                  src="/static/images/avatar/1.jpg"
-                />
-              </ListItemAvatar>
-              <ListItemText primary={eachPlayer?.userName} />
-              <ListItemText primary={eachPlayer?.score} />
-            </ListItem>
-          ))}
-        </List>
+        {playersList?.length > 0 ? (
+          <TableContainer
+            component={Paper}
+            style={{ maxHeight: "250px", overflow: "auto" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    {leaderboardConfig.tableColums.player}
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    {leaderboardConfig.tableColums.score}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {playersList.map((eachPlayer) => (
+                  <TableRow key={eachPlayer?.userName}>
+                    <TableCell component="th" scope="row">
+                      {eachPlayer?.userName}
+                    </TableCell>
+                    <TableCell>
+                      {eachPlayer?.score !== undefined
+                        ? eachPlayer?.score
+                        : leaderboardConfig.notavailable}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography variant="h6" color="grey" marginBottom="10px">
+            {leaderboardConfig.noPlayers}
+          </Typography>
+        )}
       </Grid>
     </div>
   );
