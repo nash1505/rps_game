@@ -53,7 +53,7 @@ const Lobby = () => {
       }
     });
     window.open(
-      "http://localhost:8000/playgame",
+      "/playgame",
       "game",
       "height=900,width=900"
     );
